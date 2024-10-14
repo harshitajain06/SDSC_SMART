@@ -48,7 +48,7 @@ const AthleteRegistration = () => {
       await setDoc(doc(usersRef, user.uid), userData);
 
       Alert.alert('Success', 'Registration submitted successfully!');
-      navigation.goBack(); // Navigate back or to another screen
+      navigation.navigate('AthleteDashboard');; // Navigate back or to another screen
     } catch (error) {
       Alert.alert('Error', error.message);
       console.log(error);
