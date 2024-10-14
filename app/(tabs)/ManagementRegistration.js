@@ -7,67 +7,34 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Platform,
   Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import * as Location from 'expo-location';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { auth, usersRef } from '../../config/firebase'; // Import Firebase auth and Firestore reference
+import { auth, usersRef } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
 
-const VolunteerRegistration = () => {
+const ManagementRegistration = () => {
   const navigation = useNavigation();
 
   // State for form inputs
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [location, setLocation] = useState('');
-  const [startDate, setStartDate] = useState(new Date());
+  const [sdscteam, setSdscteam] = useState('');
   const [nearestMTR, setNearestMTR] = useState('');
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
-  // Date picker change handler
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || startDate;
-    setShowDatePicker(Platform.OS === 'ios');
-    setStartDate(currentDate);
-  };
-
-  // Show date picker
-  const showDatepicker = () => {
-    setShowDatePicker(true);
-  };
-
-  // Fetch location using Expo Location API
-  const fetchLocation = async () => {
-    try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Permission to access location was denied');
-        return;
-      }
-
-      let locationResult = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = locationResult.coords;
-      let [address] = await Location.reverseGeocodeAsync({ latitude, longitude });
-      if (address) {
-        const formattedAddress = `${address.name || ''}, ${address.street || ''}, ${address.city || ''}, ${address.region || ''}, ${address.country || ''}`.trim();
-        setLocation(formattedAddress);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Unable to fetch location. Please try again.');
-      console.log(error);
-    }
-  };
 
   // Form submission handler
   const handleSubmit = async () => {
     try {
+      // Input Validation (Optional but recommended)
+      if (!name.trim() || !email.trim() || !password.trim() || !sdscteam.trim() || !nearestMTR.trim()) {
+        Alert.alert('Validation Error', 'Please fill in all fields.');
+        return;
+      }
+
       // Create user with Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -77,16 +44,15 @@ const VolunteerRegistration = () => {
         uid: user.uid,
         name,
         email,
-        location,
-        startDate: startDate.toISOString(),
+        sdscteam,
         nearestMTR,
       };
 
       // Add user data to Firestore
       await setDoc(doc(usersRef, user.uid), userData);
-      
+
       Alert.alert('Success', 'Registration submitted successfully!');
-      navigation.navigate('VolunteerDashboard');
+      navigation.goBack(); // Navigate back or to another screen
     } catch (error) {
       Alert.alert('Error', error.message);
       console.log(error);
@@ -95,21 +61,26 @@ const VolunteerRegistration = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Header */}
       <View style={styles.headerContainer}>
         <Image source={require('../../assets/images/logo.png')} style={styles.logo} />
         <Text style={styles.headerText}>SCDC SMART</Text>
       </View>
 
-      <Text style={styles.title}>Volunteering Registration Credentials</Text>
+      {/* Title */}
+      <Text style={styles.title}>Management Registration</Text>
 
+      {/* Name Input */}
       <TextInput
         style={styles.input}
         placeholder="Name"
         placeholderTextColor="#888"
         value={name}
         onChangeText={setName}
+        accessibilityLabel="Name Input"
       />
 
+      {/* Email Address Input */}
       <TextInput
         style={styles.input}
         placeholder="Email Address"
@@ -117,66 +88,57 @@ const VolunteerRegistration = () => {
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
+        accessibilityLabel="Email Address Input"
       />
 
+      {/* Password Input */}
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#888"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        secureTextEntry // Secure password input
+        accessibilityLabel="Password Input"
       />
 
+      {/* SDSC Team Input with Icon */}
       <View style={styles.inputWithIcon}>
         <TextInput
           style={styles.inputField}
-          placeholder="Location of Volunteering"
+          placeholder="SDSC Team"
           placeholderTextColor="#888"
-          value={location}
-          onChangeText={setLocation}
+          value={sdscteam}
+          onChangeText={setSdscteam}
+          accessibilityLabel="SDSC Team Input"
         />
-        <TouchableOpacity onPress={fetchLocation} style={styles.iconContainer}>
-          <Ionicons name="location-outline" size={24} color="#19235E" />
+        <TouchableOpacity style={styles.iconContainer} accessible={false}>
+          <Ionicons name="people-outline" size={24} color="#19235E" />
         </TouchableOpacity>
       </View>
 
+      {/* Nearest MTR Station Input with Icon */}
       <View style={styles.inputWithIcon}>
         <TextInput
           style={styles.inputField}
-          placeholder="When did you start volunteering?"
+          placeholder="Nearest MTR Station"
           placeholderTextColor="#888"
-          value={startDate.toLocaleDateString()}
-          editable={false}
+          value={nearestMTR}
+          onChangeText={setNearestMTR}
+          accessibilityLabel="Nearest MTR Station Input"
         />
-        <TouchableOpacity onPress={showDatepicker} style={styles.iconContainer}>
-          <Icon name="calendar" size={24} color="#19235E" />
+        <TouchableOpacity style={styles.iconContainer} accessible={false}>
+          <Ionicons name="train-outline" size={24} color="#19235E" />
         </TouchableOpacity>
       </View>
 
-      {showDatePicker && (
-        <DateTimePicker
-          value={startDate}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={onChange}
-          maximumDate={new Date()}
-        />
-      )}
-
-      <TextInput
-        style={styles.input}
-        placeholder="Nearest MTR Station"
-        placeholderTextColor="#888"
-        value={nearestMTR}
-        onChangeText={setNearestMTR}
-      />
-
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+      {/* Submit Button */}
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} accessibilityLabel="Submit Button">
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()} accessibilityLabel="Back Button">
         <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -188,16 +150,16 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#DDE4CB',
+    backgroundColor: '#DDE4CB', // Background color
   },
   headerContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row', // Align header elements in a row
     alignItems: 'center',
     marginBottom: 20,
     marginTop: 50,
   },
   logo: {
-    width: 40,
+    width: 40, // Adjusted logo size
     height: 40,
     resizeMode: 'contain',
   },
@@ -205,7 +167,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#19235E',
-    marginLeft: 10,
+    marginLeft: 10, // Space between logo and text
   },
   title: {
     fontSize: 24,
@@ -223,9 +185,10 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     color: '#000',
     backgroundColor: '#fff',
+    fontSize: 16,
   },
   inputWithIcon: {
-    position: 'relative', // Ensures icon can be positioned inside the input
+    position: 'relative', // To position the icon inside the input
     marginBottom: 15,
   },
   inputField: {
@@ -234,20 +197,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    paddingRight: 40, // Adds space for the icon
+    paddingRight: 40, // Space for the icon
     color: '#000',
     backgroundColor: '#fff',
+    fontSize: 16,
   },
   iconContainer: {
     position: 'absolute',
     right: 10, // Position icon to the right inside the input field
-    top: 12, // Vertically center the icon
+    top: 13, // Vertically center the icon
   },
   submitButton: {
     backgroundColor: '#19235E',
     paddingVertical: 15,
     borderRadius: 8,
     alignItems: 'center',
+    marginTop: 10,
   },
   submitButtonText: {
     color: '#fff',
@@ -265,4 +230,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VolunteerRegistration;
+export default ManagementRegistration;
