@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,17 +15,25 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, usersRef } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const AthleteRegistration = () => {
   const navigation = useNavigation();
 
   // State for form inputs
+  const [user, loading, error] = useAuthState(auth);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [sport, setSport] = useState('');
   const [additionalSports, setAdditionalSports] = useState('');
   const [nearestMTR, setNearestMTR] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      navigation.replace('AthleteDashboard');
+    }
+  }, [user]);
 
   // Form submission handler
   const handleSubmit = async () => {

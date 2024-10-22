@@ -42,7 +42,7 @@ const VolunteerDashboard = () => {
         </TouchableOpacity>
 
         {/* Upcoming Tournaments Button */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('UpcomingTournaments')}
           accessibilityLabel="Navigate to Upcoming Tournaments"
@@ -50,7 +50,7 @@ const VolunteerDashboard = () => {
         >
           <Ionicons name="trophy-outline" size={30} color="#fff" />
           <Text style={styles.buttonText}>Upcoming Tournaments</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Game Tutorials Button */}
         <TouchableOpacity

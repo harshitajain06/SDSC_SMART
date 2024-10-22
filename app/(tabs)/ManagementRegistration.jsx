@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,16 +15,24 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, usersRef } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const ManagementRegistration = () => {
   const navigation = useNavigation();
 
   // State for form inputs
+  const [user, loading, error] = useAuthState(auth);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [sdscteam, setSdscteam] = useState('');
   const [nearestMTR, setNearestMTR] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      navigation.replace('ManagementDashboard');
+    }
+  }, [user]);
 
   // Form submission handler
   const handleSubmit = async () => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,11 +18,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { auth, usersRef } from '../../config/firebase'; // Import Firebase auth and Firestore reference
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const VolunteerRegistration = () => {
   const navigation = useNavigation();
 
   // State for form inputs
+  const [user, loading, error] = useAuthState(auth);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,6 +32,12 @@ const VolunteerRegistration = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [nearestMTR, setNearestMTR] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      navigation.replace('VolunteerDashboard');
+    }
+  }, [user]);
 
   // Date picker change handler
   const onChange = (event, selectedDate) => {
