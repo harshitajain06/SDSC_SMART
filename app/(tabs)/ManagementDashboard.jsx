@@ -22,7 +22,7 @@ const ManagementDashboard = () => {
       {/* Buttons */}
       <View style={styles.buttonContainer}>
         {/* Update Session Timings Button */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate('UpdateSessionTimings')}
           accessibilityLabel="Navigate to Update Session Timings"
@@ -30,7 +30,7 @@ const ManagementDashboard = () => {
         >
           <Ionicons name="time-outline" size={30} color="#fff" />
           <Text style={styles.buttonText}>Update Session Timings</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Edit Session Timings Button */}
         <TouchableOpacity

@@ -55,7 +55,7 @@ const VolunteerDashboard = () => {
         {/* Game Tutorials Button */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('GameTutorials')}
+          onPress={() => navigation.navigate('SelectSport')}
           accessibilityLabel="Navigate to Game Tutorials"
           accessibilityHint="Provides tutorials to improve your game skills"
         >
