@@ -35,7 +35,7 @@ const AthleteDashboard = () => {
         {/* Transportation Enquiries Button */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('TransportationEnquiries')}
+          onPress={() => navigation.navigate('UpdateEnquiry')}
           accessibilityLabel="Transportation Enquiries Button"
           accessibilityHint="Navigate to submit transportation enquiries"
         >
