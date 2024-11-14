@@ -22,7 +22,7 @@ const VolunteerDashboard = () => {
         {/* Upcoming Sessions Button */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('UpcomingSessions')}
+          onPress={() => navigation.navigate('ShowUpcomingSessions')}
           accessibilityLabel="Navigate to Upcoming Sessions"
           accessibilityHint="Shows a list of your upcoming volunteering sessions"
         >

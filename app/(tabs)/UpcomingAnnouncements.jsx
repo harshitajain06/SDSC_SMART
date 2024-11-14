@@ -1,9 +1,8 @@
-// src/components/UpcomingAnnouncements.js
-
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { db } from '../../config/firebase'; // Adjust the import path according to your project structure
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import Icon from 'react-native-vector-icons/Ionicons'; // Import the Icon component
 
 const UpcomingAnnouncements = () => {
     const [announcements, setAnnouncements] = useState([]);
@@ -12,7 +11,6 @@ const UpcomingAnnouncements = () => {
     useEffect(() => {
         const fetchAnnouncements = async () => {
             try {
-                // Reference to the announcements collection
                 const announcementsRef = collection(db, 'announcements');
                 const querySnapshot = await getDocs(announcementsRef);
                 
@@ -40,6 +38,42 @@ const UpcomingAnnouncements = () => {
         );
     }
 
+    const handleThumbsUp = async (id, likes) => {
+        const userId = 'currentUserId'; // Replace with actual user ID logic
+        const newLikes = likes.includes(userId) ? likes.filter(uid => uid !== userId) : [...likes, userId];
+
+        try {
+            const announcementRef = doc(db, 'announcements', id);
+            await updateDoc(announcementRef, { likes: newLikes });
+            setAnnouncements(prevAnnouncements =>
+                prevAnnouncements.map(announcement =>
+                    announcement.id === id ? { ...announcement, likes: newLikes } : announcement
+                )
+            );
+        } catch (error) {
+            console.error("Error updating likes: ", error);
+            Alert.alert("Error", "Unable to update likes. Please try again.");
+        }
+    };
+
+    const handleBookmark = async (id, bookmarks) => {
+        const userId = 'currentUserId'; // Replace with actual user ID logic
+        const newBookmarks = bookmarks.includes(userId) ? bookmarks.filter(uid => uid !== userId) : [...bookmarks, userId];
+
+        try {
+            const announcementRef = doc(db, 'announcements', id);
+            await updateDoc(announcementRef, { bookmarks: newBookmarks });
+            setAnnouncements(prevAnnouncements =>
+                prevAnnouncements.map(announcement =>
+                    announcement.id === id ? { ...announcement, bookmarks: newBookmarks } : announcement
+                )
+            );
+        } catch (error) {
+            console.error("Error updating bookmarks: ", error);
+            Alert.alert("Error", "Unable to update bookmarks. Please try again.");
+        }
+    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Upcoming Announcements</Text>
@@ -52,7 +86,23 @@ const UpcomingAnnouncements = () => {
                     renderItem={({ item }) => (
                         <View style={styles.announcementContainer}>
                             <Text style={styles.announcementText}>{item.text}</Text>
-                            <Text style={styles.dateText}>{new Date(item.createdAt).toLocaleString()}</Text>
+                            <Text style={styles.dateText}>{item.createdAt.toDate().toLocaleString()}</Text>
+                            <View style={styles.actionsContainer}>
+                                <TouchableOpacity onPress={() => handleThumbsUp(item.id, item.likes || [])}>
+                                    <Icon 
+                                        name={item.likes?.includes('currentUserId') ? "thumbs-up" : "thumbs-up-outline"} 
+                                        size={24} 
+                                        color="#19235E" 
+                                    />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => handleBookmark(item.id, item.bookmarks || [])}>
+                                    <Icon 
+                                        name={item.bookmarks?.includes('currentUserId') ? "bookmark" : "bookmark-outline"} 
+                                        size={24} 
+                                        color="#19235E" 
+                                    />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     )}
                 />
@@ -106,6 +156,12 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#888',
         marginTop: 5,
+    },
+    actionsContainer: {
+        flexDirection: 'row',
+        marginTop: 10,
+        justifyContent: 'space-between',
+        width: '30%', // Adjust width as needed
     },
 });
 
