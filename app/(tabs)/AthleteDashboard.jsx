@@ -24,7 +24,7 @@ const AthleteDashboard = () => {
         {/* Upcoming Sessions/Tournaments Button */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('UpcomingSessionsTournaments')}
+          onPress={() => navigation.navigate('ShowUpcomingSessions')}
           accessibilityLabel="Upcoming Sessions and Tournaments Button"
           accessibilityHint="Navigate to view upcoming sessions and tournaments"
         >
@@ -57,7 +57,7 @@ const AthleteDashboard = () => {
         {/* Videos on Sports Button */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('VideosOnSports')}
+          onPress={() => navigation.navigate('SelectSport')}
           accessibilityLabel="Videos on Sports Button"
           accessibilityHint="Navigate to view sports-related videos"
         >

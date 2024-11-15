@@ -1,7 +1,17 @@
-// src/components/UpcomingSessions.js
+// src/components/ShowUpcomingSessions.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import Modal from 'react-native-modal';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import Legend from './Legend'; // Import the Legend component
@@ -25,6 +35,8 @@ const SESSION_COLORS = {
 const ShowUpcomingSessions = () => {
   const [markedDates, setMarkedDates] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
 
   useEffect(() => {
     fetchSessions();
@@ -42,6 +54,7 @@ const ShowUpcomingSessions = () => {
         const data = doc.data();
         const date = data.date; // Expected format: 'YYYY-MM-DD'
         const type = data.sessionType;
+
         marks[date] = {
           selected: true,
           marked: true,
@@ -52,14 +65,27 @@ const ShowUpcomingSessions = () => {
               color: SESSION_COLORS[type],
             },
           ],
+          sessionData: data, // Store session data for this date
         };
       });
 
       setMarkedDates(marks);
     } catch (error) {
       console.log('Error fetching sessions:', error);
+      Alert.alert('Error', 'Unable to fetch sessions.');
     }
     setIsLoading(false);
+  };
+
+  // Handle day press
+  const onDayPress = (day) => {
+    const selectedDateData = markedDates[day.dateString];
+    if (selectedDateData && selectedDateData.sessionData) {
+      setSelectedSession(selectedDateData.sessionData);
+      setModalVisible(true);
+    } else {
+      Alert.alert('No session', 'No sessions scheduled on this date.');
+    }
   };
 
   return (
@@ -78,6 +104,7 @@ const ShowUpcomingSessions = () => {
 
       {/* Calendar */}
       <Calendar
+        onDayPress={onDayPress}
         markedDates={markedDates}
         markingType={'multi-dot'}
         theme={{
@@ -97,6 +124,31 @@ const ShowUpcomingSessions = () => {
 
       {/* Legend */}
       <Legend sessionTypes={SESSION_TYPES} sessionColors={SESSION_COLORS} />
+
+      {/* Modal for showing session description */}
+      <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Session Details</Text>
+
+          {selectedSession ? (
+            <>
+              <Text style={styles.sessionType}>Type: {selectedSession.sessionType}</Text>
+              <Text style={styles.sessionDescription}>
+                Description: {selectedSession.description || 'No description provided'}
+              </Text>
+            </>
+          ) : (
+            <Text>No session data available</Text>
+          )}
+
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -131,6 +183,41 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     color: '#19235E',
     textAlign: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 20,
+    color: '#19235E',
+    textAlign: 'center',
+  },
+  sessionType: {
+    fontSize: 16,
+    color: '#19235E',
+    marginBottom: 10,
+  },
+  sessionDescription: {
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  closeButton: {
+    backgroundColor: '#19235E',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

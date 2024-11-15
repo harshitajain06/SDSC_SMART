@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Picker } from '@react-native-picker/picker';
+import RNPickerSelect from 'react-native-picker-select';
 
 const SelectSport = () => {
   const [selectedSport, setSelectedSport] = useState('');
@@ -19,27 +19,29 @@ const SelectSport = () => {
     <View style={styles.container}>
       {/* Logo and Heading */}
       <View style={styles.header}>
-        <Image 
-          source={{ uri: 'https://your-logo-url.com/logo.png' }} 
-          style={styles.logo} 
+        <Image
+          source={{ uri: 'https://your-logo-url.com/logo.png' }}
+          style={styles.logo}
         />
         <Text style={styles.title}>Volunteer Learning System</Text>
       </View>
 
       {/* Dropdown to Select Sport */}
       <Text style={styles.label}>Select the Sport</Text>
-      <Picker
-        selectedValue={selectedSport}
-        style={styles.picker}
-        onValueChange={(itemValue) => setSelectedSport(itemValue)}
-        dropdownIconColor="#007bff" // Change icon color for dropdown
-      >
-        <Picker.Item label="Select a sport" value="" />
-        <Picker.Item label="Football" value="Football" />
-        <Picker.Item label="Basketball" value="Basketball" />
-        <Picker.Item label="Tennis" value="Tennis" />
-        <Picker.Item label="Cricket" value="Cricket" />
-      </Picker>
+      <RNPickerSelect
+        onValueChange={(value) => setSelectedSport(value)}
+        items={[
+          { label: 'Football', value: 'Football' },
+          { label: 'Basketball', value: 'Basketball' },
+          { label: 'Tennis', value: 'Tennis' },
+          { label: 'Cricket', value: 'Cricket' },
+        ]}
+        placeholder={{ label: 'Choose a sport...', value: null }}
+        style={{
+          inputIOS: styles.picker,
+          inputAndroid: styles.picker,
+        }}
+      />
 
       {/* Navigation Buttons */}
       <TouchableOpacity style={styles.button} onPress={() => handleNavigation('howToPlay')}>
@@ -57,48 +59,53 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#DDE4CB',
   },
   header: {
     alignItems: 'center',
     marginBottom: 30,
-    marginTop: -50
+    marginTop: 50,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     marginBottom: 10,
+    resizeMode: 'contain',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#19235E',
   },
   label: {
     fontSize: 18,
+    fontWeight: '500',
+    color: '#19235E',
     marginBottom: 10,
-    color: '#333',
   },
   picker: {
-    height: 50,
-    width: '100%',
-    backgroundColor: '#fff',
-    borderColor: '#ccc',
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     borderWidth: 1,
-    marginBottom: 20,
+    borderColor: '#ccc',
     borderRadius: 8,
+    color: '#000',
+    paddingRight: 30,
+    backgroundColor: '#fff',
+    marginBottom: 20,
   },
   button: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    marginBottom: 15,
+    backgroundColor: '#19235E',
+    paddingVertical: 15,
     borderRadius: 8,
+    marginVertical: 10,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
-    elevation: 2, // For Android shadow
+    elevation: 2,
   },
   buttonText: {
     color: '#fff',

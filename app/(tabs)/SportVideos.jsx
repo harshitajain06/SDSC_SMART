@@ -47,7 +47,7 @@ const SportVideos = () => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007bff" />
+        <ActivityIndicator size="large" color="#19235E" />
       </View>
     );
   }
@@ -96,36 +96,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#DDE4CB',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    color: '#19235E',
     textAlign: 'center',
-    color: '#333',
+    marginBottom: 20,
     marginTop: 50,
   },
   videoContainer: {
     marginBottom: 20,
     backgroundColor: '#fff',
     borderRadius: 12,
-    elevation: 3, // For Android shadow
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
     padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   videoTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#007bff', // Link color
+    color: '#19235E',
     marginBottom: 5,
   },
   description: {
     fontSize: 16,
-    marginTop: 5,
     color: '#555',
     textAlign: 'center',
   },
@@ -143,7 +142,7 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 15,
-    backgroundColor: '#007bff',
+    backgroundColor: '#19235E',
     alignItems: 'center',
     borderRadius: 5,
     marginTop: 20,
